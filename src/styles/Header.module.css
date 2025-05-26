@@ -1,0 +1,143 @@
+/* src/components/Header/Header.module.css */
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff; /* Fondo blanco como en la imagen */
+  border-bottom: 1px solid #e0e0e0; /* Borde inferior sutil */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra ligera */
+  position: sticky; /* Para que se quede fijo al hacer scroll */
+  top: 0;
+  z-index: 1000; /* Para que esté sobre otros elementos */
+  width: 100%;
+}
+
+.logoContainer {
+  flex-shrink: 0; /* Evita que el logo se encoja */
+}
+
+.logoLink {
+  font-size: 1.5rem; /* Tamaño del texto del logo */
+  font-weight: bold;
+  color: #333; /* Color oscuro para el logo */
+  text-decoration: none;
+}
+
+.logoLink:hover {
+  color: #0070f3; /* Un color de hover */
+}
+
+.navigation {
+  /* El espacio se maneja con justify-content en el contenedor principal */
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Espacio entre elementos de la lista */
+}
+
+.navItem {
+  /* No se necesita mucho aquí si el gap está en .navList */
+}
+
+.navLink {
+  text-decoration: none;
+  color: #555; /* Color de texto para los enlaces */
+  font-size: 0.95rem;
+  padding: 0.5rem 0.25rem; /* Pequeño padding para mejorar el área de click */
+  transition: color 0.2s ease-in-out;
+}
+
+.navLink:hover {
+  color: #0070f3; /* Color de hover para enlaces */
+}
+
+.signInLink {
+  /* Estilo un poco más destacado si es necesario, pero puede ser igual */
+}
+
+.registerLink {
+  border: 1px solid #0070f3;
+  color: #0070f3;
+  padding: 0.4rem 0.9rem; /* Padding para que parezca un botón */
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.registerLink:hover {
+  background-color: #0070f3;
+  color: #fff;
+}
+
+.searchActionContainer {
+  display: flex;
+  align-items: center;
+}
+
+.searchButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #555; /* Color del ícono */
+}
+
+.searchButton:hover {
+  color: #0070f3;
+}
+
+.searchIcon {
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
+}
+
+/* --- Responsive (Ejemplo básico) --- */
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan si no caben */
+  }
+
+  .logoLink {
+    font-size: 1.3rem;
+  }
+
+  .navigation {
+    /* En móvil, podrías querer ocultar esto detrás de un menú hamburguesa */
+    /* Por ahora, solo reducimos el gap o permitimos que se envuelva */
+    order: 3; /* Para que la navegación vaya abajo si se envuelve */
+    width: 100%;
+    margin-top: 0.5rem; /* Espacio si se envuelve */
+    justify-content: center; /* Centrar enlaces en móvil si se envuelven */
+  }
+  
+  .navList {
+    gap: 1rem;
+    justify-content: center; /* Centrar enlaces */
+    flex-wrap: wrap;
+  }
+
+  .navLink {
+    font-size: 0.9rem;
+  }
+
+  .searchActionContainer {
+    /* Se mantiene a la derecha del logo en el flujo normal */
+  }
+}
+
+@media (max-width: 480px) {
+    .navList {
+        gap: 0.5rem; /* Aún más pequeño el gap */
+        font-size: 0.85rem;
+    }
+    .registerLink {
+        padding: 0.3rem 0.7rem;
+    }
+}
