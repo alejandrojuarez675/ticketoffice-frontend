@@ -1,6 +1,6 @@
 import React from "react";
 
-const EventInfo = ({ title, date, location, ageRestriction, time, price }) => {
+export default function EventInfo  ({ title, date, location, ageRestriction, time, price })  {
     return (
         <div className="event-info">
             <h2>{title}</h2>
@@ -16,5 +16,3 @@ const EventInfo = ({ title, date, location, ageRestriction, time, price }) => {
         </div>
     )
 }
-
-export default EventInfo;

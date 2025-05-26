@@ -1,7 +1,7 @@
 import React from "react";
 import '../styles/Footer.module.css';
 
-const Footer = () => {
+export default function Footer ()  {
     return (
         <footer>
             <span> logo </span>
@@ -23,4 +23,3 @@ const Footer = () => {
         </footer>
     );
 }
-export default Footer;

@@ -1,9 +1,9 @@
 import React from "react";
-import EventImages from "./EventImages";
-import EventInfo from "./EventInfo";
+import EventImages from "@components/EventImages";
+import EventInfo from "@components/EventInfo";
 import "../styles/EventDetail.module.css"; // Assuming you have a CSS file for styling
 
-const EventDetail = ({ eventData }) => {
+export default function EventDetail  ({ eventData })  {
     const { title, date, location, ageRestriction, time, price, images, description } = eventData;
     return (
         <div className="event-detail">
@@ -20,5 +20,3 @@ const EventDetail = ({ eventData }) => {
         </div>
     );
 }
-
-export default EventDetail;

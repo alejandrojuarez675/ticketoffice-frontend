@@ -1,6 +1,6 @@
 import React from "react";
 
-const EventImages = ({ images }) => {
+export default function EventImages ({ images })  {
     return (
         <div className="event-images">
             {images.map((image, index) => (
@@ -14,5 +14,3 @@ const EventImages = ({ images }) => {
         </div>
     );
 }
-
-export default EventImages;
