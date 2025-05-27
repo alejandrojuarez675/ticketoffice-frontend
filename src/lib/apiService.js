@@ -1,188 +1,183 @@
 // src/lib/apiService.js
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL =
+process.env.NEXT_PUBLIC_API_BASE_URL || "[http://localhost:8080](http://localhost:8080/)";
 
-/**
- * Placeholder function to get an authentication token.
- * Implement this based on how you store your tokens (e.g., localStorage, cookies via Server Actions).
- * Si se usa desde Server Components o Server Actions que pueden acceder a cookies httpOnly,
- * el token se obtendría de manera diferente (ej. import { cookies } from 'next/headers';)
- * y se pasaría explícitamente a fetchApi o se inyectaría en las opciones de cabecera.
- */
-// const getAuthToken = () => {
-//   if (typeof window !== "undefined") {
-//     return localStorage.getItem('authToken');
-//   }
-//   return null;
-// };
+// Mock data for users and events
+const mockUserData = { username: "testUser", token: "mockToken123" }; // Example user data
+const mockPublicEvents = [
+    {
+        id: 1,
+        title: "Concert of Don Omar 1",
+        date: "11-12-2025",
+        location: "Bogotá, Movistar Arena",
+        ageRestriction: 15,
+        time: "7:00 p.m.",
+        price: "100.99",
+        images: ["https://media.licdn.com/dms/image/v2/C5612AQGbvv_Zj5JQ1w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1551108267663?e=2147483647&v=beta&t=uau57Gh-xmNbI30zoJ5FHU3tvWHjKyGhaz6uxuN5Rjc", "https://academy.4.events/pt-br/wp-content/uploads/2021/05/eventos-coporativo-telao-1024x576.jpg", "https://www.jornalrmc.com.br/wp-content/uploads/2023/08/WhatsApp-Image-2023-08-22-at-10.09.05.jpg"],
+    },
+    {
+        id: 2,
+        title: "Concert of Don Omar 2",
+        date: "11-12-2025",
+        location: "Bogotá, Movistar Arena",
+        ageRestriction: 15,
+        time: "7:00 p.m.",
+        price: "100.99",
+        images: ["https://media.licdn.com/dms/image/v2/C5612AQGbvv_Zj5JQ1w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1551108267663?e=2147483647&v=beta&t=uau57Gh-xmNbI30zoJ5FHU3tvWHjKyGhaz6uxuN5Rjc", "https://academy.4.events/pt-br/wp-content/uploads/2021/05/eventos-coporativo-telao-1024x576.jpg", "https://www.jornalrmc.com.br/wp-content/uploads/2023/08/WhatsApp-Image-2023-08-22-at-10.09.05.jpg"],
+    },
+    {
+        id: 3,
+        title: "Aguilar Family Concert",
+        date: "10-30-2025",
+        location: "Colombian Plaza",
+        ageRestriction: 12,
+        time: "8:00 p.m.",
+        price: "80.50",
+        images: ["https://media.licdn.com/dms/image/v2/C5612AQGbvv_Zj5JQ1w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1551108267663?e=2147483647&v=beta&t=uau57Gh-xmNbI30zoJ5FHU3tvWHjKyGhaz6uxuN5Rjc", "https://academy.4.events/pt-br/wp-content/uploads/2021/05/eventos-coporativo-telao-1024x576.jpg", "https://www.jornalrmc.com.br/wp-content/uploads/2023/08/WhatsApp-Image-2023-08-22-at-10.09.05.jpg"],
+    },
+];
+
+// Function to mock fetching user data
+const fetchMockUser = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(mockUserData);
+        }, 1000); 
+    });
+};
+
+// Function to simulate fetching public events
+const fetchMockPublicEvents = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(mockPublicEvents);
+        }, 1000); 
+    });
+};
+
+// Function to mock fetching events
+const fetchMockEvents = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(mockPublicEvents);
+        }, 1000); 
+    });
+};
 
 const fetchApi = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
 
     const defaultHeaders = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json', // Es buena práctica incluir el header Accept
+        "Content-Type": "application/json",
+        Accept: "application/json",
     };
 
-    // Ejemplo de cómo podrías añadir un token de autenticación automáticamente
-    // const token = getAuthToken(); // O obtenerlo de `options` si se pasa explícitamente
-    // if (token) {
-    //   defaultHeaders['Authorization'] = `Bearer ${token}`;
-    // }
-    // Si el token se pasa en options.headers, se fusionará correctamente.
+    // Handle token management
+    const token = typeof window !== "undefined" ? localStorage.getItem('authToken') : null;
+    if (token) {
+        defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
 
     const config = {
         ...options,
         headers: {
-            ...defaultHeaders,
-            ...options.headers, // Permite sobrescribir o añadir cabeceras por petición
+        ...defaultHeaders,
+        ...options.headers,
         },
     };
 
     try {
+        // Use mocked APIs for testing purposes
+        if (endpoint === "/users/me") {
+            return await fetchMockUser(); // Mock user data
+        }
+        if (endpoint === "/v1/events") {
+            return await fetchMockEvents(); // Mock event data
+        }
+
+        if (endpoint === "/events/public") {
+            return await fetchMockPublicEvents(); // Mock function for public events
+        }
+
         const response = await fetch(url, config);
 
-        // Manejo de respuesta sin contenido (ej. DELETE exitoso)
-        if (response.status === 204) {
-            return null; // O podrías devolver { success: true }
-        }
-
-        // Intenta parsear el cuerpo de la respuesta como JSON
-        // Algunas APIs pueden devolver texto plano en errores no JSON
-        let responseData;
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            responseData = await response.json();
-        } else {
-            // Si no es JSON, intenta obtener el texto. Útil para errores de servidor no JSON.
-            responseData = await response.text();
-            // Si la respuesta no fue OK y no es JSON, es probable que responseData sea un mensaje de error en texto.
-            if (!response.ok) {
-                throw new Error(responseData || `Request failed with status ${response.status}`);
-            }
-        }
-
         if (!response.ok) {
-            // Si responseData es un objeto (JSON parseado), intenta obtener un mensaje de error
-            const message = responseData?.message || responseData?.error || JSON.stringify(responseData) || `Network response was not ok: ${response.status} ${response.statusText}`;
-            const error = new Error(message);
-            error.status = response.status;
-            error.data = responseData; // Adjunta toda la respuesta de error por si es útil
-            throw error;
+            const errorMessage = response.statusText || 'An error occurred';
+            throw new Error(errorMessage);
         }
 
-        return responseData;
-
-    } catch (error) {
-        // Asegurarse de que el error propagado tenga un mensaje
-        // console.error(`API call to ${url} failed:`, error.message || error);
-        // Re-lanza el error para que el componente/acción que llama pueda manejarlo
+        return await response.json();
+    }   
+    catch (error) {
         throw error;
     }
 };
 
-// --- Funciones de Servicio Específicas ---
+// --- Functions for API Operations ---
+
+export const fetchEvents = async () => {
+    // Assuming this is the endpoint to get public events
+    return await fetchApi("/events/public", {
+        method: "GET",
+    });
+};
 
 // User Signup
 export const signup = (userData) => {
-    return fetchApi('/auth/signup', {
-        method: 'POST',
+    return fetchApi("/auth/signup", {
+        method: "POST",
         body: JSON.stringify(userData),
     });
 };
 
 // User Login
-export const login = (credentials) => {
-    return fetchApi('/auth/login', {
-        method: 'POST',
+export const login = async (credentials) => {
+    const response = await fetchApi("/auth/login", {
+        method: "POST",
         body: JSON.stringify(credentials),
     });
+
+// Store the token in localStorage for future requests
+    if (response.token) {
+        localStorage.setItem('authToken', response.token);
+    }
+    return response;
 };
 
-/**
- * Create New Event
- * @param {object} eventData - Los datos del evento.
- * @param {string} [token] - Token de autenticación opcional. Si se provee, se usará.
- */
-export const createEvent = (eventData, token) => {
-    const headers = {};
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-    return fetchApi('/events', { // Asumiendo que este endpoint está bajo /api/v1
-        method: 'POST',
+// Create New Event
+export const createEvent = (eventData) => {
+    return fetchApi("/v1/events", {
+        method: "POST",
         body: JSON.stringify(eventData),
-        headers,
     });
 };
 
 // Get Authenticated User
-// El token se manejaría idealmente dentro de fetchApi o se pasaría explícitamente
-export const getAuthenticatedUser = (token) => {
-    const headers = {};
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-    return fetchApi('/users/me', { 
-        method: 'GET',
-        headers,
+export const getAuthenticatedUser = async () => {
+    return fetchApi("/users/me", {
+        method: "GET",
     });
 };
 
 // Get Event by ID
 export const getEventById = (id) => {
-    // Asumiendo que este endpoint es público y no requiere token,
-    return fetchApi(`/events/${id}`, { 
-        method: 'GET',
+    return fetchApi(`/public/v1/event/${id}`, {
+        method: "GET",
     });
 };
 
-/**
- * Obtiene una lista de eventos, con soporte para paginación.
- * El backend debe soportar query params como ?page=1&limit=10
- * y se espera que devuelva un objeto como { data: [], totalPages: 5, currentPage: 1, totalItems: 50 }
- * o similar.
- */
+// Fetch Events (with pagination if needed)
 export const getEvents = ({ page = 1, limit = 10 } = {}) => {
-    const queryParams = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
-    return fetchApi(`/events/public?${queryParams.toString()}`, {
-        method: 'GET',
+    const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
     });
-    // La respuesta esperada:
-    // {
-    //   data: [{id, name,...}, ...],
-    //   meta: {
-    //     currentPage: 1,
-    //     totalPages: 10,
-    //     itemsPerPage: 10,
-    //     totalItems: 100
-    //   }
-    // }
-    // o
-    // {
-    //   events: [...],
-    //   totalPages: 10,
-    //   currentPage: 1
-    // }
-    // Deberás ajustar cómo se procesa esta respuesta en el componente que llama a getEvents.
+    return fetchApi(`/events/public?${queryParams.toString()}`, {
+        method: "GET",
+    });
 };
 
-// añadir más funciones de servicio aquí (PUT, DELETE, etc.)
-// export const updateEvent = (id, eventData, token) => {
-//   const headers = {};
-//   if (token) headers['Authorization'] = `Bearer ${token}`;
-//   return fetchApi(`/events/${id}`, {
-//     method: 'PUT',
-//     body: JSON.stringify(eventData),
-//     headers,
-//   });
-// };
-
-// export const deleteEvent = (id, token) => {
-//   const headers = {};
-//   if (token) headers['Authorization'] = `Bearer ${token}`;
-//   return fetchApi(`/events/${id}`, {
-//     method: 'DELETE',
-//     headers,
-//   });
-// };
+// Example of more functions to add
+// export const updateEvent = (id, eventData) => { /* ... */ };
+// export const deleteEvent = (id) => { /* ... */ };

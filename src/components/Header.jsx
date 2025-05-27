@@ -1,11 +1,9 @@
-// src/components/Header/Header.jsx (o donde lo tengas)
-// Asegúrate de que Tailwind CSS esté configurado en tu proyecto Next.js 15.
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
 // import Image from 'next/image'; // Descomenta si usas un archivo de imagen para el logo
 
-// Componente SVG para el ícono de búsqueda (puedes reemplazarlo con uno de una librería)
+// Componente SVG para el ícono de búsqueda ( reemplazarlo con uno de una librería)
 const SearchIcon = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

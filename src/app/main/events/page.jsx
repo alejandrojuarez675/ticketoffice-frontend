@@ -1,80 +1,58 @@
-// src/app/(main)/events/page.jsx
-import Link from 'next/link';
-import { getEvents } from '@/lib/apiService'; // Llamamos directamente al servicio
-// O podrías usar la Server Action: import { getEventsAction } from '@/actions/eventActions';
-import EventList from '@/components/EventList';
-import PaginationControls from '@/components/PaginationControls';
+'use client';
+import React, { useEffect, useState } from 'react';
+import { fetchEvents } from '@/lib/apiService';
+import EventImages from '@/components/EventImages';
+import EventInfo from '@/components/EventInfo';
 
-// Las Server Components pueden ser async y recibir searchParams
-export default async function EventsPage({ searchParams }) {
-    const page = searchParams['page'] ? parseInt(searchParams['page']) : 1;
-    const limit = searchParams['limit'] ? parseInt(searchParams['limit']) : 10;
+export default function EventPage() {
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true); // State to manage loading
+    const [error, setError] = useState(null); // State to handle potential errors
 
-    let eventsData = { events: [], totalPages: 1, currentPage: 1 }; // Valor por defecto
-    let error = null;
-
-    try {
-        // Llamada directa al servicio
-        const result = await getEvents({ page, limit });
-        // Asumimos que `getEvents` devuelve un objeto como:
-        // { events: [...], totalPages: X, currentPage: Y } o la estructura que tu API provea.
-        // Ajusta esto según la respuesta real de tu API.
-        // Si tu API solo devuelve el array de eventos, necesitarás otra forma de obtener totalPages.
-        eventsData = {
-            events: result.data || result.events || [], // Adapta según la estructura de tu respuesta
-            totalPages: result.meta?.totalPages || result.totalPages || 1,
-            currentPage: result.meta?.currentPage || result.currentPage || page,
+    useEffect(() => {
+        const getEvents = async () => {
+            setLoading(true); // Set loading state before fetching
+            try {
+                const fetchedEvents = await fetchEvents();
+                setEvents(fetchedEvents);
+            } catch (error) {
+                console.error('Error fetching events:', error); // Log error for debugging
+                setError('Failed to fetch events'); // Set error message state
+            } finally {
+                setLoading(false); // Always reset loading state
+            }
         };
 
-        // // Alternativa usando la Server Action (si la prefieres para centralizar)
-        // const actionResult = await getEventsAction({ page, limit });
-        // if (actionResult.success) {
-        //     eventsData = {
-        //         events: actionResult.data.events || [],
-        //         totalPages: actionResult.data.totalPages || 1,
-        //         currentPage: actionResult.data.currentPage || page,
-        //     };
-        // } else {
-        //     error = actionResult.error;
-        // }
+        getEvents();
+    }, []);
 
-    } catch (e) {
-        console.error("Failed to fetch events:", e);
-        error = e.message || "Could not load events.";
+    if (loading) {
+        return <div className="text-center py-4">Loading events...</div>; // Loading state
     }
 
     if (error) {
-        return (
-            <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-4">Events</h1>
-                <p className="text-red-500">Error loading events: {error}</p>
-                <Link href="/new-event" className="text-blue-500 hover:underline">
-                    Try creating a new event
-                </Link>
-            </div>
-        );
+        return <div className="text-center py-4 text-red-500">{error}</div>; // Show error message
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Upcoming Events</h1>
-                <Link href="/new-event" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Create New Event
-                </Link>
-            </div>
-
-            {eventsData.events.length > 0 ? (
-                <EventList events={eventsData.events} />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            {events.length > 0 ? (
+                events.map((event) => (
+                    <div key={event.id} className="mb-8">
+                        <EventImages images={event.images} />
+                        <EventInfo
+                            title={event.title}
+                            date={event.date}
+                            location={event.location}
+                            ageRestriction={event.ageRestriction}
+                            time={event.time}
+                            price={event.price}
+                        />
+                    </div>
+                ))
             ) : (
-                <p>No events found. Why not create one?</p>
+                <div className="text-center py-4">No events available.</div> // Fallback if no events
             )}
-
-            <PaginationControls
-                currentPage={eventsData.currentPage}
-                totalPages={eventsData.totalPages}
-                basePath="/events" // La ruta base para la paginación
-            />
         </div>
     );
 }
