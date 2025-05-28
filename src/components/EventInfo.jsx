@@ -1,7 +1,6 @@
-// src/components/EventInfo.jsx
 export default function EventInfo({ title, date, location, ageRestriction, time, price }) {
     return (
-        <div className="event-info p-4">
+        <div className="event-info p-4 bg-white rounded-lg shadow-lg mt-4">
             <h2 className="text-2xl font-bold mb-2">{title}</h2>
             <p className="text-gray-600"><strong>Fecha:</strong> {date} (HORA LOCAL)</p>
             <p className="text-gray-600"><strong>Ubicación:</strong> {location}</p>
